@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competency Assessment Data Merge Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        select, input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        select:focus, input[type="file"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        select {
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        input[type="file"] {
+            cursor: pointer;
+            padding: 10px;
+        }
+        
+        input[type="file"]::file-selector-button {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        input[type="file"]::file-selector-button:hover {
+            background-color: #5568d3;
+        }
+        
+        .file-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+        
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button[type="submit"]:active {
+            transform: translateY(0);
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            color: #666;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        .department-icon {
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Competency Assessment Tool</h1>
+        <p class="subtitle">Merge your competency data with desired state mappings</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="instructions">
+            <h3>📋 Instructions</h3>
+            <ol>
+                <li>Select the department from the dropdown</li>
+                <li>Upload the raw data export file (CSV 1)</li>
+                <li>Upload the desired state mapping file (CSV 2)</li>
+                <li>Click "Process & Download" to get your merged file</li>
+            </ol>
+        </div>
+        
+        <form method="POST" action="/process" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="department">
+                    <span class="department-icon">🏢</span> Department
+                </label>
+                <select name="department" id="department" required>
+                    <option value="">-- Select Department --</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Application Engineering">Application Engineering</option>
+                    <option value="Commercial Operations">Commercial Operations</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="raw_data">
+                    📊 Raw Data Export (CSV 1)
+                </label>
+                <input type="file" name="raw_data" id="raw_data" accept=".csv" required>
+                <div class="file-info">Upload your raw competency assessment data</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="desired_state">
+                    🎯 Desired State Mapping (CSV 2)
+                </label>
+                <input type="file" name="desired_state" id="desired_state" accept=".csv" required>
+                <div class="file-info">Upload your desired state reference data</div>
+            </div>
+            
+            <button type="submit">
+                🚀 Process & Download
+            </button>
+        </form>
+    </div>
+    
+    <script>
+        // Add file name display when file is selected
+        document.getElementById('raw_data').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || 'No file selected';
+            console.log('Raw data file:', fileName);
+        });
+        
+        document.getElementById('desired_state').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || 'No file selected';
+            console.log('Desired state file:', fileName);
+        });
+    </script>
+</body>
+</html>
